@@ -1,7 +1,6 @@
 // Структура данных приложения
 let appData = {
-    sets: [],
-    syncToken: null // Для синхронизации между браузерами
+    sets: []
 };
 
 // Текущий режим приложения
@@ -31,14 +30,12 @@ function loadData() {
                         {
                             id: generateId(),
                             question: 'Что такое smoke-тестирование?',
-                            answer: 'Проверка основного функционала приложения на работоспособность.',
-                            status: 'new' // 'new', 'known', 'unknown'
+                            answer: 'Проверка основного функционала приложения на работоспособность.'
                         },
                         {
                             id: generateId(),
                             question: 'Что такое regression testing?',
-                            answer: 'Проверка того, что новые изменения не сломали существующий функционал.',
-                            status: 'new'
+                            answer: 'Проверка того, что новые изменения не сломали существующий функционал.'
                         }
                     ]
                 }
@@ -51,49 +48,6 @@ function loadData() {
 // Сохранение данных в localStorage
 function saveData() {
     localStorage.setItem('cardAppData', JSON.stringify(appData));
-}
-
-// Функция экспорта данных
-function exportData() {
-    const dataStr = JSON.stringify(appData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = 'my-cards-data.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-}
-
-// Функция импорта данных
-function importData() {
-    const inputElement = document.createElement('input');
-    inputElement.type = 'file';
-    inputElement.accept = '.json';
-    
-    inputElement.onchange = function(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            try {
-                const importedData = JSON.parse(e.target.result);
-                if (confirm('Вы уверены, что хотите заменить все текущие данные?')) {
-                    appData = importedData;
-                    saveData();
-                    renderMainContent(); // Обновляем интерфейс
-                    alert('Данные успешно импортированы!');
-                }
-            } catch (error) {
-                alert('Ошибка при импорте данных: Неверный формат файла');
-            }
-        };
-        
-        reader.readAsText(file);
-    };
-    
-    inputElement.click();
 }
 
 // Генерация уникального ID
@@ -122,44 +76,26 @@ function renderMainContent() {
 function renderSetsView(container) {
     container.innerHTML = `
         <h2>Мои наборы карточек</h2>
-        <div class="controls-container">
-            <button class="btn btn-success" id="new-set-btn">+ Новый набор</button>
-            <div class="import-export-buttons">
-                <button class="btn btn-info" id="export-btn">📥 Экспорт данных</button>
-                <button class="btn btn-info" id="import-btn">📤 Импорт данных</button>
-            </div>
-        </div>
+        <button class="btn btn-success" id="new-set-btn">+ Новый набор</button>
         <div id="sets-list">
-            ${appData.sets.map(set => {
-                const totalCards = set.cards.length;
-                const knownCards = set.cards.filter(card => card.status === 'known').length;
-                const unknownCards = set.cards.filter(card => card.status === 'unknown').length;
-                const newCards = set.cards.filter(card => card.status === 'new').length;
-                
-                return `
-                    <div class="card-set" data-set-id="${set.id}">
-                        <div class="card-set-info">
-                            <div class="card-set-title">${set.title}</div>
-                            <div class="card-set-stats">
-                                <div class="card-set-count">${totalCards} карточек</div>
-                                <div class="card-set-progress">Изучено: ${knownCards} | Не изучено: ${unknownCards} | Новых: ${newCards}</div>
-                            </div>
-                        </div>
-                        <div class="card-set-actions">
-                            <button class="btn btn-warning edit-set-btn" data-set-id="${set.id}">📝 Редактировать</button>
-                            <button class="btn btn-success copy-set-btn" data-set-id="${set.id}">📄 Копировать</button>
-                            <button class="btn btn-danger delete-set-btn" data-set-id="${set.id}">🗑️ Удалить</button>
-                        </div>
+            ${appData.sets.map(set => `
+                <div class="card-set" data-set-id="${set.id}">
+                    <div class="card-set-info">
+                        <div class="card-set-title">${set.title}</div>
+                        <div class="card-set-count">${set.cards.length} карточек</div>
                     </div>
-                `;
-            }).join('')}
+                    <div class="card-set-actions">
+                        <button class="btn btn-warning edit-set-btn" data-set-id="${set.id}">📝 Редактировать</button>
+                        <button class="btn btn-success copy-set-btn" data-set-id="${set.id}">📄 Копировать</button>
+                        <button class="btn btn-danger delete-set-btn" data-set-id="${set.id}">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('')}
         </div>
     `;
     
     // Добавляем обработчики событий
     document.getElementById('new-set-btn').addEventListener('click', showNewSetForm);
-    document.getElementById('export-btn').addEventListener('click', exportData);
-    document.getElementById('import-btn').addEventListener('click', importData);
     document.querySelectorAll('.edit-set-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const setId = e.target.getAttribute('data-set-id');
@@ -310,18 +246,8 @@ function renderCardsView(container) {
         return;
     }
     
-    // Подсчет статусов карточек
-    const totalCards = set.cards.length;
-    const knownCards = set.cards.filter(card => card.status === 'known').length;
-    const unknownCards = set.cards.filter(card => card.status === 'unknown').length;
-    const newCards = set.cards.filter(card => card.status === 'new').length;
-    
     container.innerHTML = `
         <h2>${set.title}</h2>
-        <div class="stats-container">
-            <div class="stats">Всего: ${totalCards} | Изучено: ${knownCards} | Не изучено: ${unknownCards} | Новых: ${newCards}</div>
-            <button class="btn print-btn" id="print-cards">🖨️ Печать</button>
-        </div>
         <button class="btn back-btn" id="back-to-sets">← Назад к наборам</button>
         <button class="btn btn-success" id="new-card-btn">+ Новая карточка</button>
         <button class="btn btn-warning" id="start-repetition">Начать повторение</button>
@@ -331,7 +257,6 @@ function renderCardsView(container) {
                 <div class="card" data-card-id="${card.id}">
                     <div class="card-question">${card.question}</div>
                     <div class="card-answer">${card.answer}</div>
-                    <div class="card-status">${getStatusIcon(card.status)}</div>
                     <div class="card-actions">
                         <button class="btn btn-warning show-answer-btn" data-card-id="${card.id}">Показать</button>
                         <button class="btn edit-card-btn" data-card-id="${card.id}">✏️ Редактировать</button>
@@ -355,10 +280,6 @@ function renderCardsView(container) {
     document.getElementById('start-repetition').addEventListener('click', () => {
         currentView = 'repetition';
         renderMainContent();
-    });
-    
-    document.getElementById('print-cards').addEventListener('click', () => {
-        printCards(set);
     });
     
     document.querySelectorAll('.show-answer-btn').forEach(btn => {
@@ -390,49 +311,6 @@ function renderCardsView(container) {
             deleteCard(cardId);
         });
     });
-}
-
-// Функция для получения иконки статуса
-function getStatusIcon(status) {
-    switch(status) {
-        case 'known': return '✅';
-        case 'unknown': return '❌';
-        case 'new': return '🆕';
-        default: return '❓';
-    }
-}
-
-// Функция печати карточек
-function printCards(set) {
-    // Создаем новое окно для печати
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html>
-            <head>
-                <title>Печать карточек - ${set.title}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .card { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
-                    .question { font-weight: bold; margin-bottom: 10px; }
-                    .answer { margin-top: 10px; display: none; }
-                    @media print {
-                        .page-break { page-break-before: always; }
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Карточки: ${set.title}</h1>
-                ${set.cards.map(card => `
-                    <div class="card">
-                        <div class="question">${card.question}</div>
-                    </div>
-                    <div class="page-break"></div>
-                `).join('')}
-            </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
 }
 
 // Показать форму для новой карточки
@@ -474,8 +352,7 @@ function showNewCardForm() {
                 const newCard = {
                     id: generateId(),
                     question: question,
-                    answer: answer,
-                    status: 'new'
+                    answer: answer
                 };
                 set.cards.push(newCard);
                 saveData();
@@ -560,8 +437,7 @@ function copyCard(cardId) {
     const newCard = {
         id: generateId(),
         question: originalCard.question,
-        answer: originalCard.answer,
-        status: originalCard.status || 'new'
+        answer: originalCard.answer
     };
     
     set.cards.push(newCard);
@@ -584,41 +460,18 @@ function deleteCard(cardId) {
 // Рендеринг режима повторения
 function renderRepetitionView(container) {
     const set = appData.sets.find(s => s.id === currentSetId);
-    if (!set) {
+    if (!set || set.cards.length === 0) {
         currentView = 'cards';
         renderMainContent();
         return;
     }
     
-    // Берем только карточки со статусом 'new' или 'unknown' для повторения
-    const cardsToRepeat = set.cards.filter(card => card.status === 'new' || card.status === 'unknown');
-    
-    if (cardsToRepeat.length === 0) {
-        container.innerHTML = `
-            <h2>Повторение: ${set.title}</h2>
-            <button class="btn back-btn" id="back-to-cards">← Назад к карточкам</button>
-            <div class="repetition-container">
-                <div class="repetition-message">
-                    <h3>Нет карточек для повторения!</h3>
-                    <p>Все карточки в этом наборе отмечены как изученные.</p>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('back-to-cards').addEventListener('click', () => {
-            currentView = 'cards';
-            renderMainContent();
-        });
-        return;
-    }
-    
     // Подготовим сессию повторения
     currentRepetitionSession = {
-        cards: [...cardsToRepeat], // копия карточек для повторения
+        cards: [...set.cards], // копия карточек
         currentIndex: 0,
         knownCount: 0,
-        totalCount: cardsToRepeat.length,
-        originalSetId: currentSetId
+        totalCount: set.cards.length
     };
     
     // Перемешаем карточки
@@ -667,20 +520,12 @@ function showNextRepetitionCard(container) {
     });
     
     document.getElementById('know-btn').addEventListener('click', () => {
-        // Обновляем статус карточки на 'known'
-        const currentCard = currentRepetitionSession.cards[currentRepetitionSession.currentIndex];
-        updateCardStatus(currentCard.id, 'known');
-        
         currentRepetitionSession.knownCount++;
         currentRepetitionSession.currentIndex++;
         showNextRepetitionCard(container);
     });
     
     document.getElementById('dont-know-btn').addEventListener('click', () => {
-        // Обновляем статус карточки на 'unknown'
-        const currentCard = currentRepetitionSession.cards[currentRepetitionSession.currentIndex];
-        updateCardStatus(currentCard.id, 'unknown');
-        
         // Для простоты, карточка остается в сессии, просто переходим к следующей
         currentRepetitionSession.currentIndex++;
         showNextRepetitionCard(container);
@@ -711,17 +556,5 @@ function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// Функция для обновления статуса карточки
-function updateCardStatus(cardId, status) {
-    for (const set of appData.sets) {
-        const card = set.cards.find(c => c.id === cardId);
-        if (card) {
-            card.status = status;
-            saveData(); // Сохраняем изменения
-            break;
-        }
     }
 }
