@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Фон карточки -->
+  <rect x="80" y="100" width="352" height="312" rx="20" fill="#4FC3F7" stroke="#0288D1" stroke-width="8"/>
+  
+  <!-- Тень/Объем (задняя карточка) -->
+  <rect x="100" y="120" width="352" height="312" rx="20" fill="#B3E5FC" stroke="#0288D1" stroke-width="4"/>
+  
+  <!-- Линия разделения языков -->
+  <line x1="80" y1="256" x2="432" y2="256" stroke="#0288D1" stroke-width="4"/>
+  
+  <!-- Текст EN -->
+  <text x="256" y="200" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="white" text-anchor="middle">EN</text>
+  
+  <!-- Текст RU -->
+  <text x="256" y="360" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="white" text-anchor="middle">RU</text>
+  
+  <!-- Блик для объема -->
+  <path d="M 100 140 L 432 140" stroke="rgba(255,255,255,0.4)" stroke-width="8" stroke-linecap="round"/>
+</svg>

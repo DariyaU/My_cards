@@ -1,5 +1,5 @@
-name: flashcards_app
-description: "Оффлайн приложение для изучения слов с карточками (RU-EN)"
+name: my_cards_app
+description: "Оффлайн приложение My Cards для изучения слов с карточками (RU-EN)"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -33,6 +33,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.18.1
+  
+  # Launcher Icons
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -44,10 +47,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   
-  # assets:
-  #   - assets/images/
+  assets:
+    - assets/images/
   
   # fonts:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.svg"
+  min_sdk_android: 21
